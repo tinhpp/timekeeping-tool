@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.spring.timekeeping.mapper.DepartmentMapper">
+	<!-- Get All Department -->
+	<select id="getAllDepartment" 
+		resultType="org.spring.timekeeping.domain.response.DepartmentResponse">
+		SELECT IdDepartment As idDepartment
+		      ,DepartmentName As departmentName
+		      ,Description As description
+		      ,ActionUser As actionUser
+		      ,UpdateAt As updateAt
+		      ,CreateAt As createAt
+		  FROM tbDepartment
+	</select>
+	<!-- Get Department by Id -->
+	<select id="getDepartmentById" 
+		resultType="org.spring.timekeeping.domain.response.DepartmentResponse">
+		SELECT IdDepartment As idDepartment
+		      ,DepartmentName As departmentName
+		      ,Description As description
+		      ,UpdateAt As updateAt
+		  FROM tbDepartment
+		 WHERE IdDepartment = #{idDepartment}
+	</select>
+	<!-- Insert Department -->
+	<insert id="insertDepartment" 
+		useGeneratedKeys="true"
+		keyProperty="idDepartment" 
+		keyColumn="IdDepartment"
+		parameterType="org.spring.timekeeping.domain.DepartmentEntity">
+		INSERT INTO tbDepartment
+	           (DepartmentName
+	           ,Description
+	           ,ActionUser
+	           ,UpdateAt
+	           ,CreateAt)
+	     VALUES
+	           (#{departmentName}
+	           ,#{description}
+	           ,#{actionUser}
+	           ,CURRENT_TIMESTAMP
+	           ,CURRENT_TIMESTAMP)
+	</insert>
+	<!-- Update Department -->
+	<update id="updateDepartment"
+			parameterType="org.spring.timekeeping.domain.DepartmentEntity">
+		UPDATE  tbDepartment
+		   SET  DepartmentName = #{departmentName}
+		       ,Description = #{description}
+		    <if test="description != null">
+			   ,Description = #{description}
+			</if>
+			   ,ActionUser = #{actionUser}
+			   ,UpdateAt = CURRENT_TIMESTAMP
+		 WHERE IdDepartment = #{idDepartment}
+	</update>
+	<!-- Delete Department -->
+	<delete id="deleteDepartment"
+			parameterType="org.spring.timekeeping.domain.DepartmentEntity">
+		DELETE FROM tbDepartment
+		 WHERE IdDepartment = #{idDepartment}
+	</delete>
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.spring.timekeeping.mapper.UserMapper">
+	<!-- Get all user info -->
+	<select id="getAllListUserBySearchInfo" 
+			resultType="org.spring.timekeeping.domain.response.UserResponse">
+		SELECT UserName As userName
+		      ,AddressMail As addressMail
+		      ,FirstName As firstName
+		      ,LastName As lastName
+		      ,DateOfBirth As dateOfBirth
+		      ,DateOfJoiningTheCompany As dateOfJoiningTheCompany
+		      ,Sex As sex
+		      ,u.ActionUser As actionUser
+		      ,StatusUser As statusUser
+		      ,u.UpdateAt As updateAt
+		      ,u.CreateAt As createAt
+		      ,DepartmentName As departmentName
+		  FROM tbUser u
+			INNER JOIN tbDepartment d
+		            ON u.IdDepartment = d.IdDepartment         
+		  <where>
+			  <if test="userName != null">
+			    Lower(u.UserName) = Lower(#{userName})
+			  </if>
+			  <if test="addressMail != null">
+			  	<bind name="patternEmail" value="'%' + addressMail + '%'" />
+			    AND u.AddressMail LIKE  #{patternEmail}
+			  </if>
+			  <if test="fullName != null">
+			  	<bind name="patternName" value="'%' + fullName + '%'" />
+			    AND (u.FirstName LIKE  #{patternName}
+			     OR u.LastName  LIKE  #{patternName})
+			  </if>
+			  <if test="dateOfBirth != null">
+			    AND CONVERT(VARCHAR, u.DateOfBirth, 103) =  #{dateOfBirth}
+			  </if>
+			  <if test="sex != null">
+			    AND u.Sex =  #{sex}
+			  </if>
+			  <if test="idDepartment != null">
+			    AND d.IdDepartment =  #{idDepartment}
+			  </if>
+			  <if test="statusUser != null">
+			    AND u.StatusUser =  #{statusUser}
+			  </if>
+		  </where>
+	</select>
+	<!-- Get user info by UserName -->
+	<select id="getUserByUserName" 
+			resultType="org.spring.timekeeping.domain.response.UserResponse">
+		SELECT UserName As userName
+		      ,AddressMail As addressMail
+		      ,FirstName As firstName
+		      ,LastName As lastName
+		      ,DateOfBirth As dateOfBirth
+		      ,DateOfJoiningTheCompany As dateOfJoiningTheCompany
+		      ,Sex As sex
+		      ,IdDepartment As idDepartment
+		      ,ActionUser As actionUser
+		      ,UpdateAt As updateAt
+		      ,CreateAt As createAt
+		  FROM tbUser
+		 WHERE UserName = #{userName}
+	</select>
+	<!-- Save user in DataBase -->
+	<insert id="insertUser" 
+		parameterType="org.spring.timekeeping.domain.UserEntity">
+		INSERT INTO dbo.tbUser
+		           (UserName
+		           ,Password
+		           ,AddressMail
+		           ,FirstName
+		           ,LastName
+		           ,DateOfBirth
+		           ,DateOfJoiningTheCompany
+		           ,Sex
+		           ,IdDepartment
+		           ,StatusUser
+		           ,ActionUser
+		           ,UpdateAt
+		           ,CreateAt)
+		     VALUES
+		           (#{userName}
+		           ,#{password}
+		           ,#{addressMail}
+		           ,#{firstName}
+		           ,#{lastName}
+		           ,#{dateOfBirth}
+		           ,#{dateOfJoiningTheCompany}
+		           ,#{sex}
+		           ,#{idDepartment}
+		           ,#{statusUser}
+		           ,#{actionUser}
+		           ,CURRENT_TIMESTAMP
+		           ,CURRENT_TIMESTAMP)
+	</insert>
+	<!-- Update user info -->
+	<update id="updateUser" parameterType="org.spring.timekeeping.domain.UserEntity">
+		UPDATE tbUser
+		   SET 
+			<if test="password != null">
+			    Password = #{password}
+			</if>
+			<if test="addressMail != null">
+		      ,AddressMail = #{addressMail}
+			</if>
+			<if test="firstName != null">
+		      ,FirstName = #{firstName}
+			</if>
+			<if test="lastName != null">
+		      ,LastName = #{lastName}
+			</if>
+			<if test="dateOfBirth != null">
+		      ,DateOfBirth = #{dateOfBirth}
+			</if>
+			<if test="dateOfJoiningTheCompany != null">
+		      ,DateOfJoiningTheCompany = #{dateOfJoiningTheCompany}
+			</if>
+			<if test="sex != null">
+		      ,Sex = #{sex}
+			</if>
+			<if test="idDepartment != null">
+		      ,IdDepartment = #{idDepartment}
+			</if>
+		      ,ActionUser = {actionUser}
+		      ,UpdateAt = CURRENT_TIMESTAMP
+		 WHERE UserName = #{userName}
+	</update>
+	<!-- Delete user by UserName -->
+	<delete id="deleteUser" parameterType="org.spring.timekeeping.domain.UserEntity">
+	    DELETE FROM tbUser
+        WHERE UserName = #{userName}
+	</delete>
+	<!-- Delete list user by UserName -->
+	<delete id="deleteListUserByUserName">
+	    DELETE FROM tbUser
+        WHERE UserName IN
+        <foreach item="item" index="index" collection="listUser"
+        	open="(" separator="," close=")">
+        		#{item.userName}
+        </foreach>
+	</delete>
+</mapper>
